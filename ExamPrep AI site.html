@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExamPrep AI — Grade 9 English</title>
+<style>
+:root{
+  --bg:#f4f7fb;--card:#fff;--ink:#182033;--muted:#69748a;--line:#e2e7ef;
+  --accent:#5b5ce2;--accent2:#7b61ff;--good:#198754;--bad:#d9485f;
+  --warn:#c77900;--shadow:0 14px 40px rgba(30,40,70,.08);--radius:20px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,textarea{font:inherit}button{cursor:pointer}
+.app{min-height:100vh}
+.topbar{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:10}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800}.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:grid;place-items:center}
+.top-actions{display:flex;gap:8px}.ghost{border:1px solid var(--line);background:#fff;padding:9px 13px;border-radius:12px;color:var(--muted)}
+main{max-width:1120px;margin:0 auto;padding:30px 20px 60px}
+.hero{background:linear-gradient(135deg,#1f2552,#5b5ce2);color:#fff;border-radius:28px;padding:34px;box-shadow:var(--shadow);margin-bottom:22px}
+.hero h1{font-size:clamp(30px,5vw,48px);margin:0 0 10px}.hero p{margin:0;max-width:760px;line-height:1.6;opacity:.9}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}.stat{background:rgba(255,255,255,.12);padding:15px;border-radius:16px}.stat b{display:block;font-size:24px}.stat span{font-size:12px;opacity:.8}
+.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:20px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+.card h2{margin:0 0 6px}.sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+.skill{padding:14px 0;border-bottom:1px solid var(--line)}.skill:last-child{border-bottom:0}.skill-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:7px}.skill-name{font-weight:700}.skill-meta{color:var(--muted);font-size:13px}.bar{height:8px;background:#edf0f5;border-radius:99px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px}
+.actions{display:grid;gap:10px}.primary{border:0;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:13px 16px;border-radius:13px;font-weight:750}.secondary{border:1px solid var(--line);background:#fff;color:var(--ink);padding:13px 16px;border-radius:13px;font-weight:700}
+.hidden{display:none!important}.view{display:none}.view.active{display:block}
+.practice-top{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:16px}.pill{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#eef0ff;color:#4d4fb8;font-size:12px;font-weight:800}
+.question{font-size:23px;line-height:1.45;margin:20px 0}.options{display:grid;gap:10px}.option{border:1px solid var(--line);background:#fff;text-align:left;padding:14px 16px;border-radius:13px}.option:hover{border-color:#aeb3f4;background:#fafaff}.option:disabled{cursor:default}
+.feedback{margin-top:16px;padding:15px;border-radius:15px;background:#f6f8fc;border:1px solid var(--line);line-height:1.5}.feedback.good{border-color:#bfe4cf;background:#f2fbf5}.feedback.bad{border-color:#f1c4cb;background:#fff5f6}
+.hint{color:var(--warn);font-weight:700}.next{margin-top:12px}
+.lesson{margin:14px 0 18px;padding:16px;background:#f8f9fd;border-radius:15px;border-left:4px solid var(--accent)}.lesson ul{margin:8px 0 0 18px;padding:0}.lesson li{margin:5px 0}
+.write-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.prompt{font-size:21px;line-height:1.5;padding:18px;background:#f7f8fc;border-radius:16px}.writing-area{width:100%;min-height:360px;border:1px solid var(--line);border-radius:16px;padding:16px;resize:vertical;line-height:1.6}.score{font-size:40px;font-weight:850}.rubric{display:grid;gap:10px;margin-top:15px}.rubric-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+.back{margin-bottom:14px}.tiny{font-size:12px;color:var(--muted)}
+@media(max-width:820px){.grid,.write-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.topbar{padding:0 14px}main{padding:20px 14px 50px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="logo">9</div><span>ExamPrep AI</span></div>
+  <div class="top-actions"><button class="ghost" id="resetBtn">Reset progress</button></div>
+</header>
+
+<main>
+<section id="dashboard" class="view active">
+  <div class="hero">
+    <h1>Grade 9 English</h1>
+    <p>An adaptive practice space for grammar, vocabulary, phrasal verbs, transformations and story writing. Your progress is saved in this browser.</p>
+    <div class="stats">
+      <div class="stat"><b id="statAnswered">0</b><span>questions answered</span></div>
+      <div class="stat"><b id="statAccuracy">0%</b><span>overall accuracy</span></div>
+      <div class="stat"><b id="statStreak">0</b><span>current streak</span></div>
+      <div class="stat"><b id="statMastery">0%</b><span>skills mastered</span></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Skill map</h2>
+      <p class="sub">The tutor prioritises skills that are unpractised or still developing.</p>
+      <div id="skillMap"></div>
+    </section>
+    <aside class="card">
+      <h2>Practice</h2>
+      <p class="sub">Choose how you want to work today.</p>
+      <div class="actions">
+        <button class="primary" id="adaptiveBtn">Continue adaptive practice</button>
+        <button class="secondary" id="weakBtn">Practise my weakest area</button>
+        <button class="secondary" id="writingBtn">Story writing workshop</button>
+      </div>
+      <div class="lesson">
+        <b>How mastery works</b>
+        <ul>
+          <li>New skills begin at Foundation level.</li>
+          <li>Accuracy moves questions toward Exam level and Challenge.</li>
+          <li>Repeated mistakes trigger targeted practice instead of simply moving on.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section id="practice" class="view">
+  <button class="ghost back" id="practiceBack">← Dashboard</button>
+  <div class="card">
+    <div class="practice-top">
+      <div><span class="pill" id="difficultyPill">Foundation</span> <span class="tiny" id="skillLabel"></span></div>
+      <div class="tiny" id="questionCount"></div>
+    </div>
+    <div id="miniLesson" class="lesson"></div>
+    <div class="question" id="questionText"></div>
+    <div class="options" id="options"></div>
+    <div id="feedback" class="hidden"></div>
+    <button class="primary next hidden" id="nextBtn">Next question</button>
+  </div>
+</section>
+
+<section id="writing" class="view">
+  <button class="ghost back" id="writingBack">← Dashboard</button>
+  <div class="card">
+    <div class="practice-top">
+      <div>
+        <span class="pill">Unit 9 • Proposal Writing</span>
+        <span class="tiny">16-point assessment</span>
+      </div>
+      <button class="secondary" id="newWritingPrompt">New prompt</button>
+    </div>
+
+    <h2 id="writingTitle">Environmental Proposal</h2>
+    <p class="sub">Plan first, then write a persuasive and organised proposal about an environmental challenge.</p>
+
+    <div class="write-grid">
+      <div>
+        <h3>Your task</h3>
+        <div class="prompt" id="writingPrompt"></div>
+        <p id="writingScenario" class="tiny"></p>
+
+        <div class="lesson">
+          <b>What your proposal should do</b>
+          <ul>
+            <li>Make the purpose of the proposal clear.</li>
+            <li>Give a clear summary of the situation/results.</li>
+            <li>Suggest action points that can actually help with the problem.</li>
+            <li>Use specific Unit 9 environmental vocabulary.</li>
+          </ul>
+        </div>
+
+        <h3>Plan your proposal</h3>
+        <div class="lesson">
+          <b>1. Purpose</b>
+          <p>What environmental challenge are you addressing, and what is your proposal trying to achieve?</p>
+          <b>2. Results / situation</b>
+          <p>What has happened? What are the consequences?</p>
+          <b>3. Action points</b>
+          <p>Give practical actions. Explain how they could help.</p>
+          <b>4. Final recommendation</b>
+          <p>End by making your main recommendation clear.</p>
+        </div>
+
+        <h3>Useful language</h3>
+        <div class="lesson">
+          <b>Showing results and consequences</b>
+          <p>As a result • Consequently • Due to • lead to • as a consequence</p>
+          <b>Unit 9 vocabulary</b>
+          <p>biodiversity • ecosystem • sustainable</p>
+          <p class="tiny">Your Unit 9 work may also focus on topics such as plastic waste, food waste, carbon footprint, water consumption, sustainable agriculture, sustainable transport, sustainable energy, sustainable tourism, pollution, microplastics and endangered marine species.</p>
+        </div>
+      </div>
+
+      <div>
+        <h3>Your proposal</h3>
+        <p class="tiny">Target length: roughly 140–190 words.</p>
+        <textarea id="writingText" class="writing-area" placeholder="Write your proposal here..."></textarea>
+        <button class="primary" id="scoreWriting" style="margin-top:10px">Check my proposal</button>
+
+        <div class="lesson" style="margin-top:14px">
+          <b>Before you submit</b>
+          <ul>
+            <li>Is the purpose clear?</li>
+            <li>Have you summarised the results/situation?</li>
+            <li>Are your action points realistic and useful?</li>
+            <li>Have you used at least 2 result/consequence expressions?</li>
+            <li>Have you used at least 2 Unit 9 vocabulary items?</li>
+            <li>Is your proposal roughly 140–190 words?</li>
+            <li>Have you checked spelling and grammar?</li>
+          </ul>
+        </div>
+
+        <div id="writingResult" class="hidden"></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+
+<script>
+/*
+=========================================================
+EXAMPREP AI — EASY-EDIT STRUCTURE
+=========================================================
+This file is intentionally organised into four independent
+areas:
+
+1. APP_CONFIG      = general site settings
+2. ENGINE_CONFIG   = adaptive/mastery behaviour
+3. CONTENT_BANK    = lessons + original questions
+4. WRITING_CONFIG  = current writing task + rubric
+
+When you want to add material later, CONTENT_BANK is the
+main place to edit. When you want a new writing task, only
+WRITING_CONFIG needs to change.
+
+The site does NOT contain the real test's answer key.
+Questions below are original practice items.
+=========================================================
+*/
+
+const APP_CONFIG = {
+  title: "ExamPrep AI — Grade 9 English",
+  storageKey: "examPrep9_v2"
+};
+
+const ENGINE_CONFIG = {
+  masteryAccuracy: 0.85,
+  minimumAttemptsForMastery: 3,
+  recentQuestionMemory: 6
+};
+
+const CONTENT_BANK = {
+  passive: {
+    name:"Passive voice",
+    lesson:["Use the passive when the action/result is more important than who does it.","Choose the tense from the context: is done, was done, is being done, has been done, will be done.","Check the auxiliary + past participle carefully."],
+    questions:[
+      {q:"The school hall ___ for the ceremony at the moment.",opts:["is being decorated","was decorated","has decorated","will decorate"],a:0,e:"The phrase 'at the moment' points to Present Continuous Passive: is being + past participle."},
+      {q:"By Friday, the posters ___ in every classroom.",opts:["will have been placed","are placing","were placed","have placed"],a:0,e:"A completed action before a future deadline can use Future Perfect Passive: will have been + past participle."},
+      {q:"The new sports centre ___ before the autumn term begins.",opts:["will have been completed","has completed","is completing","was completing"],a:0,e:"The completion happens before a future point, so Future Perfect Passive fits."},
+      {q:"More than 200 applications ___ since the programme opened.",opts:["have been received","were receiving","are received","will receive"],a:0,e:"'Since' connects a past starting point with the present: Present Perfect Passive."}
+    ]
+  },
+  perfect: {
+    name:"Perfect tenses",
+    lesson:["Present Perfect connects a past event to now.","Past Perfect describes an earlier past action before another past event.","Look for signals such as since, already, before, by the time and yet."],
+    questions:[
+      {q:"Mia ___ the report already, so she can send it now.",opts:["has finished","had finished","is finishing","was finishing"],a:0,e:"The result is relevant now, so Present Perfect is the best fit."},
+      {q:"When we arrived, the film ___ already.",opts:["had started","has started","starts","was starting"],a:0,e:"The film started before we arrived, so Past Perfect shows the earlier past action."},
+      {q:"They ___ at the school for six years and still enjoy working there.",opts:["have worked","had worked","were working","will work"],a:0,e:"The situation began in the past and continues to the present."},
+      {q:"By the time the teacher checked the computer, someone ___ the file.",opts:["had deleted","has deleted","deletes","was deleting"],a:0,e:"Deleting happened before the teacher checked, so Past Perfect is needed."}
+    ]
+  },
+  continuous: {
+    name:"Continuous tenses",
+    lesson:["Continuous forms describe actions in progress.","Past Continuous often provides background for a shorter past event.","Future Continuous describes something that will be in progress at a future time."],
+    questions:[
+      {q:"While the students ___ the experiment, the alarm suddenly rang.",opts:["were conducting","conducted","have conducted","will conduct"],a:0,e:"A longer action in progress interrupted by a shorter past event uses Past Continuous."},
+      {q:"At this time tomorrow, I ___ on the train to Varna.",opts:["will be travelling","travelled","have travelled","was travelling"],a:0,e:"'At this time tomorrow' points to Future Continuous."},
+      {q:"Listen! The technicians ___ the new equipment.",opts:["are testing","tested","had tested","will have tested"],a:0,e:"The action is happening now, so Present Continuous fits."},
+      {q:"At 8 p.m. yesterday, the team ___ the final presentation.",opts:["was preparing","has prepared","will prepare","had prepared"],a:0,e:"A specific moment in the past with an action in progress calls for Past Continuous."}
+    ]
+  },
+  future: {
+    name:"Future forms",
+    lesson:["Use will for predictions, decisions and some promises.","Use be going to for intentions or predictions based on present evidence.","Use Present Continuous for arranged future events and suitable timetables where appropriate."],
+    questions:[
+      {q:"Look at those dark clouds. It ___ soon.",opts:["is going to rain","rained","has rained","was raining"],a:0,e:"There is present evidence, so 'be going to' is natural."},
+      {q:"The science club ___ the museum on Thursday; the tickets are already booked.",opts:["is visiting","visited","has visited","was visiting"],a:0,e:"A fixed arrangement can use Present Continuous."},
+      {q:"I think people ___ more electric cars in the future.",opts:["will use","are using yesterday","had used","were using"],a:0,e:"A prediction without present evidence commonly uses will."}
+    ]
+  },
+  modals: {
+    name:"Modals",
+    lesson:["must expresses strong obligation; have to also expresses necessity.","may can express possibility.","Check whether the sentence is about obligation, permission, ability or possibility."],
+    questions:[
+      {q:"Students ___ wear an ID badge during the trip; it is a school rule.",opts:["must","may","might","could"],a:0,e:"The sentence describes a rule, so must expresses obligation."},
+      {q:"You ___ bring a laptop; the school will provide one.",opts:["do not have to","must","may not","could"],a:0,e:"The meaning is lack of necessity: do not have to."},
+      {q:"Sara ___ have misunderstood the instructions; she is asking for clarification.",opts:["may","mustn't","has to","can"],a:0,e:"May expresses possibility here."}
+    ]
+  },
+  third: {
+    name:"Third conditional",
+    lesson:["Use If + Past Perfect for the unreal past condition.","Use would have + past participle for the imagined past result.","Both parts describe a past situation that did not happen."],
+    questions:[
+      {q:"If I ___ the map, we would not have got lost.",opts:["had brought","brought","would bring","have brought"],a:0,e:"Third conditional: If + Past Perfect."},
+      {q:"If they had left earlier, they ___ the beginning of the show.",opts:["would not have missed","will not miss","did not miss","would not miss"],a:0,e:"The result of an unreal past condition uses would have + past participle."},
+      {q:"If Lena ___ the warning, she would have changed her plan.",opts:["had noticed","noticed","would notice","has noticed"],a:0,e:"The if-clause needs Past Perfect for the third conditional."}
+    ]
+  },
+  compare: {
+    name:"Comparisons",
+    lesson:["Comparatives compare two things: bigger, more useful, less expensive.","Superlatives compare one item with a group: the biggest, the most useful.","Watch for than and expressions such as the fastest in the team."],
+    questions:[
+      {q:"The new library is ___ than the old one.",opts:["more spacious","most spacious","as spacious","the spacious"],a:0,e:"A comparison between two places uses the comparative form."},
+      {q:"Daniel is ___ runner on the team.",opts:["the fastest","faster","fastest than","the faster"],a:0,e:"One person is being compared with the whole team, so a superlative is needed."},
+      {q:"The blue jacket is not ___ the black one.",opts:["as warm as","warmer than","the warmest","more warm"],a:0,e:"The pattern for equal comparison is as + adjective + as."}
+    ]
+  },
+  reported: {
+    name:"Reported speech",
+    lesson:["Backshift is common after a past reporting verb: can → could, will → would, present → past.","Change pronouns and time expressions when the reporting context requires it.","Questions and requests use different structures from reported statements."],
+    questions:[
+      {q:"Lina said, “I can't find my notebook.” → Lina said that she ___ find her notebook.",opts:["couldn't","can't","won't","hadn't"],a:0,e:"Can normally backshifts to could after a past reporting verb, with the pronoun changing to she."},
+      {q:"Alex said, “I'll finish the presentation tonight.” → Alex said that he ___ the presentation that night.",opts:["would finish","will finish","finished","has finished"],a:0,e:"Will commonly becomes would in reported speech after a past reporting verb."},
+      {q:"“Are you joining the trip?” Mrs Green asked me. → Mrs Green asked me ___ joining the trip.",opts:["if I was","that I was","did I","whether was I"],a:0,e:"A reported yes/no question uses if/whether + statement word order."},
+      {q:"“Please don't leave your bags here,” the guard told us. → The guard told us ___ our bags there.",opts:["not to leave","don't leave","not leaving","we didn't leave"],a:0,e:"A reported negative command uses told + object + not to + infinitive."}
+    ]
+  },
+  vocab: {
+    name:"Grade 9 vocabulary",
+    lesson:["Use context, word class and meaning together.","Useful words include hamlet, commuter town, bustling, vacancy, fibre, reusable, serving, stubborn, persuade, remote, salary.","Do not rely on the first familiar-looking option."],
+    questions:[
+      {q:"The hikers stopped in a tiny ___ with fewer than twenty houses.",opts:["hamlet","salary","vacancy","fibre"],a:0,e:"A hamlet is a very small settlement."},
+      {q:"The market becomes especially ___ before the winter holidays.",opts:["bustling","remote","reusable","stubborn"],a:0,e:"Bustling means busy and full of activity."},
+      {q:"There is a ___ in the marketing department for someone with strong communication skills.",opts:["vacancy","serving","hamlet","fibre"],a:0,e:"A vacancy is an available job position."},
+      {q:"Instead of buying a new cup every day, I carry a ___ one in my backpack.",opts:["reusable","remote","stubborn","bustling"],a:0,e:"Reusable means designed to be used again."},
+      {q:"We finally managed to ___ our classmates to join the project.",opts:["persuade","serve","commute","vacancy"],a:0,e:"Persuade means convince someone to do something."},
+      {q:"The job offers a good ___ and flexible working hours.",opts:["salary","hamlet","fibre","serving"],a:0,e:"Salary is money paid regularly for work."}
+    ]
+  },
+  particles: {
+    name:"Phrasal verb particles",
+    lesson:["Learn the whole phrasal verb, not only the particle.","Common Grade 9 combinations include come up with, give up, get along, look after and come across.","Context tells you which particle completes the verb."],
+    questions:[
+      {q:"The team had to come ___ with a practical solution.",opts:["up","after","along","into"],a:0,e:"The phrasal verb is come up with: think of or produce an idea."},
+      {q:"Even after the first plan failed, they refused to give ___.",opts:["up","after","into","along"],a:0,e:"Give up means stop trying."},
+      {q:"The group members get ___ very well.",opts:["along","up","after","into"],a:0,e:"Get along means have a good relationship."},
+      {q:"Two volunteers agreed to look ___ the plants.",opts:["after","up","into","along"],a:0,e:"Look after means take care of."},
+      {q:"While cleaning the storeroom, we came ___ some useful tools.",opts:["across","up","after","out"],a:0,e:"Come across means find something unexpectedly."}
+    ]
+  },
+  use: {
+    name:"Phrasal verbs in context",
+    lesson:["Focus on meaning in a full sentence.","Common target verbs include turn down, run out of, show up, carry on, bring up, look into, find out and look after.","Read the whole sentence before choosing."],
+    questions:[
+      {q:"The volunteers ___ before eight o'clock, so we could start on time.",opts:["showed up","ran out of","turned down","looked into"],a:0,e:"Show up means arrive."},
+      {q:"We ___ paper cups and had to buy more.",opts:["ran out of","brought up","showed up","turned down"],a:0,e:"Run out of means have none left."},
+      {q:"The teacher asked us to ___ the possibility of another event.",opts:["look into","show up","give up","get along"],a:0,e:"Look into means investigate or examine."},
+      {q:"Although the activity was difficult, they decided to ___ with it.",opts:["carry on","turn down","find out","run out"],a:0,e:"Carry on means continue."},
+      {q:"The committee will ___ the results before making a decision.",opts:["find out","look after","turn down","bring up"],a:0,e:"Find out means discover information."}
+    ]
+  },
+  transformations: {
+    name:"Key Word Transformations",
+    lesson:["Keep the meaning the same.","Use the given word exactly as instructed.","Check grammar, tense, word order and the number of words required."],
+    questions:[
+      {q:"Rewrite using BEEN: Nora started learning Japanese four years ago and still studies it. → Nora ___ Japanese for four years.",opts:["has been learning","had been learning","was learning","will be learning"],a:0,e:"A situation continuing to now can use Present Perfect Continuous: has been learning."},
+      {q:"Rewrite using HAVE: Attendance at the extra workshop is not required. → Students ___ attend the extra workshop.",opts:["don't have to","mustn't","may not","hadn't"],a:0,e:"Don't have to expresses lack of necessity."},
+      {q:"Rewrite using GOT: I left the map at home, so we got lost. → If I had taken the map, we ___ lost.",opts:["wouldn't have got","won't get","didn't get","wouldn't get"],a:0,e:"This is a third conditional result."},
+      {q:"Rewrite using SUCH: The concert was so impressive that we bought tickets for the next show. → It was ___ concert that we bought tickets for the next show.",opts:["such an impressive","so an impressive","such impressive an","an such impressive"],a:0,e:"The pattern is such + a/an + adjective + singular countable noun."}
+    ]
+  }
+};
+
+/*
+The writing task is intentionally isolated.
+When you give me the new task, this is the only section
+that needs to change.
+*/
+const WRITING_CONFIG = {
+  title: "Environmental Proposal",
+  prompts: [
+    {
+      task: "Your school wants to reduce the amount of plastic waste produced by the school cafeteria. Write a proposal suggesting practical ways to reduce plastic usage and explaining how these actions could help.",
+      focus: "Reduce plastic waste / plastic usage in the school cafeteria."
+    },
+    {
+      task: "Your school wants to reduce food waste. Write a proposal suggesting practical actions the school could take and explaining the possible results.",
+      focus: "Reduce food waste."
+    },
+    {
+      task: "Your school wants to reduce its carbon footprint. Write a proposal suggesting realistic changes to transport, energy use or other school activities and explain their likely results.",
+      focus: "Reduce carbon footprint."
+    },
+    {
+      task: "Your school wants to reduce water consumption and waste. Write a proposal with practical action points and explain how they could improve the situation.",
+      focus: "Reduce water consumption/waste."
+    },
+    {
+      task: "Your school wants to encourage sustainable commuting and transport. Write a proposal suggesting practical ways students and staff could travel more sustainably and explain the expected results.",
+      focus: "Support sustainable commuting/transport."
+    },
+    {
+      task: "Your school wants to raise awareness of the dangers of microplastics and how to avoid them. Write a proposal suggesting actions the school could take and explaining their possible impact.",
+      focus: "Raise awareness of microplastics."
+    },
+    {
+      task: "Your school wants to raise awareness of air, land or water pollution and what people should avoid doing. Write a proposal suggesting practical actions and explaining the expected results.",
+      focus: "Raise awareness of pollution and prevention."
+    },
+    {
+      task: "Your school wants to raise awareness of endangered marine species and how to protect them. Write a proposal suggesting practical actions and explaining how they could help.",
+      focus: "Protect endangered marine species."
+    },
+    {
+      task: "Your school wants to support sustainable packaging. Write a proposal suggesting realistic changes the school or cafeteria could make and explain the likely results.",
+      focus: "Support sustainable packaging."
+    },
+    {
+      task: "Your local community wants to support sustainable local businesses. Write a proposal suggesting ways schools and young people could help and explain the possible results.",
+      focus: "Support sustainable local businesses."
+    }
+  ],
+  rubric: {
+    structure: 4,
+    taskCompletion: 4,
+    vocabulary: 4,
+    language: 4
+  }
+};
+
+const stateDefault = {attempts:{},history:[],streak:0,answered:0,correct:0,writing:[],writingPromptIndex:null};
+let state = loadState();
+let current = null;
+let currentMode = "adaptive";
+
+function loadState(){
+  try{return {...stateDefault,...JSON.parse(localStorage.getItem(APP_CONFIG.storageKey)||"")}}catch(e){return {...stateDefault}}
+}
+function saveState(){localStorage.setItem(APP_CONFIG.storageKey,JSON.stringify(state))}
+function pct(n,d){return d?Math.round(n/d*100):0}
+function skillStats(id){
+  const a=state.attempts[id]||{n:0,c:0};
+  return {n:a.n,c:a.c,acc:pct(a.c,a.n)};
+}
+function mastered(id){
+  const s=skillStats(id);
+  return s.n>=ENGINE_CONFIG.minimumAttemptsForMastery && s.acc>=ENGINE_CONFIG.masteryAccuracy*100;
+}
+function difficulty(id){
+  const s=skillStats(id);
+  if(s.n<1 || s.acc<60)return "Foundation";
+  if(s.acc<85)return "Exam level";
+  return "Challenge";
+}
+function chooseSkill(forceId=null){
+  if(forceId && CONTENT_BANK[forceId])return forceId;
+  const ids=Object.keys(CONTENT_BANK);
+  const unpractised=ids.filter(id=>skillStats(id).n===0);
+  if(unpractised.length)return unpractised[Math.floor(Math.random()*unpractised.length)];
+  const active=ids.filter(id=>!mastered(id));
+  if(!active.length)return ids[Math.floor(Math.random()*ids.length)];
+  active.sort((a,b)=>skillStats(a).acc-skillStats(b).acc || skillStats(a).n-skillStats(b).n);
+  return active[0];
+}
+function chooseQuestion(id){
+  const bank=CONTENT_BANK[id].questions;
+  const recent=state.history.slice(-ENGINE_CONFIG.recentQuestionMemory);
+  const available=bank.filter((_,i)=>!recent.includes(id+":"+i));
+  const pool=available.length?available:bank;
+  const index=Math.floor(Math.random()*pool.length);
+  const q=pool[index];
+  const realIndex=bank.indexOf(q);
+  state.history.push(id+":"+realIndex);
+  if(state.history.length>30)state.history.shift();
+  return q;
+}
+function showView(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+function renderDashboard(){
+  document.getElementById("statAnswered").textContent=state.answered;
+  document.getElementById("statAccuracy").textContent=state.answered?pct(state.correct,state.answered)+"%":"0%";
+  document.getElementById("statStreak").textContent=state.streak;
+  const ids=Object.keys(CONTENT_BANK);
+  document.getElementById("statMastery").textContent=pct(ids.filter(mastered).length,ids.length)+"%";
+  document.getElementById("skillMap").innerHTML=ids.map(id=>{
+    const s=skillStats(id);
+    return `<div class="skill"><div class="skill-head"><span class="skill-name">${CONTENT_BANK[id].name}</span><span class="skill-meta">${s.n?`${s.acc}% • ${s.n} attempts`:"Not practised"}</span></div><div class="bar"><i style="width:${s.acc}%"></i></div></div>`;
+  }).join("");
+}
+function startPractice(forceId=null){
+  currentMode=forceId?"weak":"adaptive";
+  const id=chooseSkill(forceId);
+  const q=chooseQuestion(id);
+  current={id,q,answered:false};
+  document.getElementById("difficultyPill").textContent=difficulty(id);
+  document.getElementById("skillLabel").textContent=CONTENT_BANK[id].name;
+  document.getElementById("questionCount").textContent=`${state.answered+1} overall`;
+  document.getElementById("miniLesson").innerHTML=`<b>Quick reminder</b><ul>${CONTENT_BANK[id].lesson.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+  document.getElementById("questionText").textContent=q.q;
+  document.getElementById("options").innerHTML=q.opts.map((x,i)=>`<button class="option" data-i="${i}">${String.fromCharCode(65+i)}. ${x}</button>`).join("");
+  document.getElementById("feedback").className="hidden";
+  document.getElementById("feedback").innerHTML="";
+  document.getElementById("nextBtn").classList.add("hidden");
+  document.querySelectorAll(".option").forEach(b=>b.addEventListener("click",()=>answer(Number(b.dataset.i))));
+  showView("practice");
+}
+function answer(i){
+  if(current.answered)return;
+  current.answered=true;
+  const ok=i===current.q.a;
+  const id=current.id;
+  if(!state.attempts[id])state.attempts[id]={n:0,c:0};
+  state.attempts[id].n++;
+  state.answered++;
+  if(ok){state.attempts[id].c++;state.correct++;state.streak++}else{state.streak=0}
+  saveState();
+  document.querySelectorAll(".option").forEach((b,idx)=>{b.disabled=true;if(idx===i)b.style.borderColor=ok?"#8ac7a5":"#e2a1aa"});
+  const box=document.getElementById("feedback");
+  if(ok){
+    box.className="feedback good";
+    box.innerHTML=`<b>Correct.</b> ${current.q.e}`;
+  }else{
+    box.className="feedback bad";
+    box.innerHTML=`<b>Not quite.</b><br><span class="hint">Hint:</span> ${hintFor(id)}<br><br><span class="tiny">Try to explain the rule before moving on. The correct option is not shown.</span>`;
+  }
+  document.getElementById("nextBtn").classList.remove("hidden");
+}
+function hintFor(id){
+  const h={
+    passive:"Look at the time expression and identify the passive tense needed.",
+    perfect:"Ask which event happened first and whether the result connects to now.",
+    continuous:"Look for an action in progress at a particular time.",
+    future:"Decide whether this is a prediction, intention or arrangement.",
+    modals:"Identify whether the sentence expresses obligation, necessity or possibility.",
+    third:"Check for an unreal past condition and the two-part conditional pattern.",
+    compare:"Decide whether you are comparing two things or one thing with a group.",
+    reported:"Check tense backshift, pronouns and reported question/command structure.",
+    vocab:"Use the context and the meaning of each word, not only its appearance.",
+    particles:"Recall the complete phrasal verb and its meaning.",
+    use:"Read the whole sentence and choose the phrasal verb that fits the meaning.",
+    transformations:"Keep the meaning unchanged and use the given key word exactly."
+  };
+  return h[id]||"Look carefully at the grammar and context.";
+}
+function currentWritingPrompt(){
+  if(!state.writingPromptIndex && state.writingPromptIndex!==0){
+    state.writingPromptIndex = Math.floor(Math.random()*WRITING_CONFIG.prompts.length);
+    saveState();
+  }
+  return WRITING_CONFIG.prompts[state.writingPromptIndex];
+}
+function setWritingPrompt(forceNew=false){
+  if(forceNew){
+    const oldIndex = state.writingPromptIndex;
+    let next = Math.floor(Math.random()*WRITING_CONFIG.prompts.length);
+    if(WRITING_CONFIG.prompts.length>1) while(next===oldIndex) next=Math.floor(Math.random()*WRITING_CONFIG.prompts.length);
+    state.writingPromptIndex=next;
+    saveState();
+    document.getElementById("writingText").value="";
+    document.getElementById("writingResult").classList.add("hidden");
+  }
+  const p=currentWritingPrompt();
+  document.getElementById("writingPrompt").textContent=p.task;
+  document.getElementById("writingScenario").textContent="Focus: "+p.focus;
+}
+function scoreWriting(){
+  const text=document.getElementById("writingText").value.trim();
+  const words=text?text.split(/\s+/).length:0;
+  const sentences=text?text.split(/[.!?]+/).filter(Boolean).length:0;
+  const paragraphs=text?text.split(/\n\s*\n/).filter(x=>x.trim()).length:0;
+
+  const resultPhrases = [
+    /\bas a result\b/i, /\bconsequently\b/i, /\bdue to\b/i,
+    /\blead to\b/i, /\bleads to\b/i, /\bled to\b/i, /\bas a consequence\b/i
+  ];
+  const resultCount=resultPhrases.filter(r=>r.test(text)).length;
+  const unitWords=[
+    "biodiversity","ecosystem","sustainable","plastic","waste",
+    "carbon footprint","water consumption","pollution","microplastics",
+    "renewable","transport","packaging","agriculture","tourism",
+    "marine species"
+  ];
+  const vocabCount=unitWords.filter(w=>text.toLowerCase().includes(w)).length;
+  const actionMarkers=(text.match(/\b(should|could|need to|must|recommend|suggest|introduce|reduce|support|raise awareness|encourage|replace|provide|organise|organize)\b/gi)||[]).length;
+  const linkers=(text.match(/\b(firstly|first|secondly|also|however|therefore|finally|in conclusion|as a result|consequently|due to|as a consequence)\b/gi)||[]).length;
+
+  // This is a formative estimate aligned to the supplied 16-point rubric.
+  let structure = paragraphs>=4 ? 4 : paragraphs>=3 ? 3 : paragraphs>=2 ? 2 : paragraphs>=1 ? 1 : 0;
+  if(sentences>=8 && structure<4) structure++;
+  structure=Math.min(4,structure);
+
+  let taskCompletion=0;
+  if(text) taskCompletion++;
+  if(sentences>=3) taskCompletion++;
+  if(actionMarkers>=2 && words>=100) taskCompletion+=2;
+  taskCompletion=Math.min(4,taskCompletion);
+
+  let vocabulary=(resultCount>=2?2:resultCount===1?1:0)+(vocabCount>=2?2:vocabCount===1?1:0);
+  vocabulary=Math.min(4,vocabulary);
+
+  let language=(words>=140 && words<=190?2:(words>=100?1:0));
+  const errorSignals=(text.match(/\b(i|we|the|and|to)\s+[A-Za-z]+ing\b/g)||[]).length;
+  if(words>=50 && errorSignals<4) language+=2;
+  else if(words>=50) language+=1;
+  language=Math.min(4,language);
+
+  const total=structure+taskCompletion+vocabulary+language;
+  const feedback=[];
+  if(structure<4) feedback.push("Make the proposal easier to follow with clear sections or paragraphs.");
+  if(taskCompletion<4) feedback.push("Make sure the purpose, results/situation and practical action points are all clearly developed.");
+  if(resultCount<2) feedback.push("Use at least two expressions for giving results: As a result, Consequently, Due to, lead to, or as a consequence.");
+  if(vocabCount<2) feedback.push("Use at least two relevant Unit 9 environmental vocabulary items.");
+  if(words<140 || words>190) feedback.push("Aim for roughly 140–190 words.");
+  if(!feedback.length) feedback.push("Your draft covers the main checklist points. Proofread carefully for precise vocabulary, spelling and grammar.");
+
+  const result=document.getElementById("writingResult");
+  result.classList.remove("hidden");
+  result.innerHTML=`<div class="score">${total}/16</div>
+    <p class="tiny">Formative automatic estimate — use it as a self-check, not as a final teacher mark.</p>
+    <div class="rubric">
+      <div class="rubric-row"><span>Structure</span><b>${structure}/4</b></div>
+      <div class="rubric-row"><span>Task Completion</span><b>${taskCompletion}/4</b></div>
+      <div class="rubric-row"><span>Vocabulary</span><b>${vocabulary}/4</b></div>
+      <div class="rubric-row"><span>Language and task</span><b>${language}/4</b></div>
+    </div>
+    <div class="feedback">${feedback.map(x=>`<div>• ${x}</div>`).join("")}</div>
+    <p class="tiny">Evidence detected: ${resultCount} result/consequence expression(s), ${vocabCount} relevant Unit 9 vocabulary item(s), ${words} words.</p>`;
+  state.writing.push({date:new Date().toISOString(),words,total,prompt:currentWritingPrompt().task});
+  saveState();
+}
+function resetProgress(){
+  if(confirm("Reset all saved progress on this browser?")){
+    localStorage.removeItem(APP_CONFIG.storageKey);state=loadState();renderDashboard();showView("dashboard");
+  }
+}
+document.getElementById("adaptiveBtn").onclick=()=>startPractice();
+document.getElementById("weakBtn").onclick=()=>startPractice(chooseSkill());
+document.getElementById("writingBtn").onclick=()=>{setWritingPrompt(false);showView("writing")};
+document.getElementById("newWritingPrompt").onclick=()=>setWritingPrompt(true);
+document.getElementById("practiceBack").onclick=()=>{renderDashboard();showView("dashboard")};
+document.getElementById("writingBack").onclick=()=>showView("dashboard");
+document.getElementById("nextBtn").onclick=()=>startPractice(currentMode==="weak"?current.id:null);
+document.getElementById("scoreWriting").onclick=scoreWriting;
+document.getElementById("resetBtn").onclick=resetProgress;
+setWritingPrompt(false);
+renderDashboard();
+</script>
+</body>
+</html>
